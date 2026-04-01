@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>it.consciousdreams.maven-quick-build</id>
     <name>MavenQuickBuild</name>
-    <vendor>consciousdreams</vendor>
+    <vendor email="consciousdreams86@gmail.com" url="https://github.com/consciousdreams/maven-quick-build">consciousdreams</vendor>
     <description>Adds toolbar buttons to run mvn clean install with or without tests</description>
 
     <depends>com.intellij.modules.platform</depends>
