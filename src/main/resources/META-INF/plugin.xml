@@ -1,0 +1,33 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>it.consciousdreams.maven-quick-build</id>
+    <name>MavenQuickBuild</name>
+    <vendor>consciousdreams</vendor>
+    <description>Adds toolbar buttons to run mvn clean install with or without tests</description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.idea.maven</depends>
+
+    <actions>
+        <group id="it.consciousdreams.MavenToolbarGroup" text="Maven" popup="false">
+            <!-- New UI toolbar (2022.3+) -->
+            <add-to-group group-id="MainToolbarRight" anchor="last"/>
+            <!-- Legacy toolbar -->
+            <add-to-group group-id="MainToolBar" anchor="last"/>
+            <add-to-group group-id="NavBarToolBar" anchor="last"/>
+
+            <action
+                id="it.consciousdreams.MavenCleanInstallAction"
+                class="it.consciousdreams.MavenCleanInstallAction"
+                text="Maven Clean Install (skip tests)"
+                description="Runs: mvn clean install -Dmaven.test.skip=true"
+                icon="/icons/maven_install.svg"/>
+            <action
+                id="it.consciousdreams.MavenCleanInstallWithTestsAction"
+                class="it.consciousdreams.MavenCleanInstallWithTestsAction"
+                text="Maven Clean Install"
+                description="Runs: mvn clean install"
+                icon="/icons/maven_install_with_tests.svg"/>
+        </group>
+    </actions>
+</idea-plugin>
