@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>it.consciousdreams.maven-quick-build</id>
     <name>MavenQuickBuild</name>
-    <vendor email="consciousdreams86@gmail.com" url="https://github.com/consciousdreams/maven-quick-build">consciousdreams</vendor>
+    <vendor url="https://github.com/consciousdreams/maven-quick-build">consciousdreams</vendor>
     <description>Adds toolbar buttons to run mvn clean install with or without tests</description>
 
     <depends>com.intellij.modules.platform</depends>
@@ -21,13 +21,21 @@
                 class="it.consciousdreams.MavenCleanInstallAction"
                 text="Maven Clean Install (skip tests)"
                 description="Runs: mvn clean install -Dmaven.test.skip=true"
-                icon="/icons/maven_install.svg"/>
+                icon="/icons/maven_install.svg">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>
+                <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta alt S"/>
+                <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt S"/>
+            </action>
             <action
                 id="it.consciousdreams.MavenCleanInstallWithTestsAction"
                 class="it.consciousdreams.MavenCleanInstallWithTestsAction"
                 text="Maven Clean Install"
                 description="Runs: mvn clean install"
-                icon="/icons/maven_install_with_tests.svg"/>
+                icon="/icons/maven_install_with_tests.svg">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt M"/>
+                <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta alt M"/>
+                <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt M"/>
+            </action>
         </group>
     </actions>
 </idea-plugin>

@@ -24,8 +24,9 @@
     <thead>
       <tr style="background: #f0f4f0;">
         <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f; border-radius: 6px 0 0 0;">Button</th>
-        <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f;">Command</th>
-        <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f; border-radius: 0 6px 0 0;">Description</th>
+        <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f;">Mac</th>
+        <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f;">Win / Linux</th>
+        <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f; border-radius: 0 6px 0 0;">Command</th>
       </tr>
     </thead>
     <tbody>
@@ -36,8 +37,13 @@
             Skip Tests
           </span>
         </td>
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <span style="background: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 2px 7px; font-family: monospace; font-size: 12px;">&#8984;+&#8997;+S</span>
+        </td>
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <span style="background: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 2px 7px; font-family: monospace; font-size: 12px;">Ctrl+Alt+S</span>
+        </td>
         <td style="padding: 12px 14px; font-family: monospace; font-size: 12px; color: #555; vertical-align: middle;">mvn clean install -Dmaven.test.skip=true</td>
-        <td style="padding: 12px 14px; color: #555; vertical-align: middle;">Full build without running tests &mdash; ideal for fast iteration.</td>
       </tr>
       <tr>
         <td style="padding: 12px 14px; vertical-align: middle;">
@@ -46,8 +52,13 @@
             With Tests
           </span>
         </td>
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <span style="background: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 2px 7px; font-family: monospace; font-size: 12px;">&#8984;+&#8997;+M</span>
+        </td>
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <span style="background: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 2px 7px; font-family: monospace; font-size: 12px;">Ctrl+Alt+M</span>
+        </td>
         <td style="padding: 12px 14px; font-family: monospace; font-size: 12px; color: #555; vertical-align: middle;">mvn clean install</td>
-        <td style="padding: 12px 14px; color: #555; vertical-align: middle;">Full build including all tests &mdash; perfect before committing.</td>
       </tr>
     </tbody>
   </table>
@@ -58,6 +69,7 @@
     <li style="margin-bottom: 8px;">Buttons appear in <strong>MainToolBar</strong> and <strong>NavBarToolBar</strong> &mdash; always one click away</li>
     <li style="margin-bottom: 8px;">Buttons are automatically <strong>disabled</strong> when no project is open</li>
     <li style="margin-bottom: 8px;">Buttons are <strong>hidden</strong> in non-Maven projects &mdash; no clutter</li>
+    <li style="margin-bottom: 8px;"><strong>Keyboard shortcuts</strong> available out of the box &mdash; no configuration required</li>
     <li style="margin-bottom: 8px;">Uses the native <strong>MavenRunner</strong> API &mdash; output streams directly to the IDE's run console</li>
     <li style="margin-bottom: 8px;">The skip-tests variant <strong>never mutates</strong> global Maven settings &mdash; fully safe</li>
   </ul>

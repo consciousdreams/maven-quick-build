@@ -11,12 +11,12 @@ An IntelliJ IDEA plugin that adds Maven shortcut buttons to the toolbar for runn
 
 Two toolbar buttons are added to the main toolbar and nav bar toolbar:
 
-| Button | Command |
-|--------|---------|
-| Maven Clean Install (skip tests) | `mvn clean install -Dmaven.test.skip=true` |
-| Maven Clean Install | `mvn clean install` |
+| Button | Shortcut (Mac) | Shortcut (Win/Linux) | Command |
+|--------|---------------|----------------------|---------|
+| Maven Clean Install (skip tests) | `Cmd+Option+S` | `Ctrl+Alt+S` | `mvn clean install -Dmaven.test.skip=true` |
+| Maven Clean Install | `Cmd+Option+M` | `Ctrl+Alt+M` | `mvn clean install` |
 
-Both buttons are only enabled when a Maven project is open.
+Both buttons are only enabled when a Maven project is open. Keyboard shortcuts are also available when the plugin is active.
 
 ## Requirements
 
