@@ -1,5 +1,9 @@
 # MavenQuickBuild
 
+[![JetBrains Plugin](https://img.shields.io/jetbrains/plugin/v/31045-mavenquickbuild)](https://plugins.jetbrains.com/plugin/31045-mavenquickbuild)
+
+[**Install from JetBrains Marketplace**](https://plugins.jetbrains.com/plugin/31045-mavenquickbuild)
+
 <!-- Plugin description -->
 An IntelliJ IDEA plugin that adds Maven shortcut buttons to the toolbar for running `mvn clean install` with or without tests.
 
@@ -7,12 +11,12 @@ An IntelliJ IDEA plugin that adds Maven shortcut buttons to the toolbar for runn
 
 Two toolbar buttons are added to the main toolbar and nav bar toolbar:
 
-| Button | Command |
-|--------|---------|
-| Maven Clean Install (skip tests) | `mvn clean install -Dmaven.test.skip=true` |
-| Maven Clean Install | `mvn clean install` |
+| Button | Shortcut (Mac) | Shortcut (Win/Linux) | Command |
+|--------|---------------|----------------------|---------|
+| Maven Clean Install (skip tests) | `Cmd+Option+S` | `Ctrl+Alt+S` | `mvn clean install -Dmaven.test.skip=true` |
+| Maven Clean Install | `Cmd+Option+M` | `Ctrl+Alt+M` | `mvn clean install` |
 
-Both buttons are only enabled when a Maven project is open.
+Both buttons are only enabled when a Maven project is open. Keyboard shortcuts are also available when the plugin is active.
 
 ## Requirements
 
@@ -32,6 +36,26 @@ Both buttons are only enabled when a Maven project is open.
 # Compile only
 ./gradlew compileJava
 ```
+
+## Release & Publish
+
+The project uses GitHub Actions for CI/CD.
+
+### Automatic flow
+
+1. Push to `main` → builds, verifies the plugin, and creates a **draft GitHub Release** with changelog notes
+2. Review the draft on GitHub → publish it → the plugin is automatically **signed and published to JetBrains Marketplace**
+
+### Required secrets (GitHub → Settings → Secrets)
+
+| Secret | Description |
+|---|---|
+| `PUBLISH_TOKEN` | JetBrains Marketplace token (your profile → Tokens) |
+| `CERTIFICATE_CHAIN` | Plugin signing certificate chain |
+| `PRIVATE_KEY` | Plugin signing private key |
+| `PRIVATE_KEY_PASSWORD` | Password for the private key |
+
+> To generate signing keys: `./gradlew signPlugin` (first time only, follow the prompts).
 
 ## Manual Installation
 
