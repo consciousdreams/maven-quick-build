@@ -1,5 +1,9 @@
 # MavenQuickBuild
 
+[![JetBrains Plugin](https://img.shields.io/jetbrains/plugin/v/31045-mavenquickbuild)](https://plugins.jetbrains.com/plugin/31045-mavenquickbuild)
+
+[**Install from JetBrains Marketplace**](https://plugins.jetbrains.com/plugin/31045-mavenquickbuild)
+
 <!-- Plugin description -->
 An IntelliJ IDEA plugin that adds Maven shortcut buttons to the toolbar for running `mvn clean install` with or without tests.
 
