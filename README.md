@@ -37,6 +37,26 @@ Both buttons are only enabled when a Maven project is open. Keyboard shortcuts a
 ./gradlew compileJava
 ```
 
+## Release & Publish
+
+The project uses GitHub Actions for CI/CD.
+
+### Automatic flow
+
+1. Push to `main` → builds, verifies the plugin, and creates a **draft GitHub Release** with changelog notes
+2. Review the draft on GitHub → publish it → the plugin is automatically **signed and published to JetBrains Marketplace**
+
+### Required secrets (GitHub → Settings → Secrets)
+
+| Secret | Description |
+|---|---|
+| `PUBLISH_TOKEN` | JetBrains Marketplace token (your profile → Tokens) |
+| `CERTIFICATE_CHAIN` | Plugin signing certificate chain |
+| `PRIVATE_KEY` | Plugin signing private key |
+| `PRIVATE_KEY_PASSWORD` | Password for the private key |
+
+> To generate signing keys: `./gradlew signPlugin` (first time only, follow the prompts).
+
 ## Manual Installation
 
 1. Run `./gradlew buildPlugin`

@@ -38,3 +38,7 @@ TEST*.xml
 Thumbs.db
 
 secrets.env
+
+# Signing credentials
+cert/*.pem
+cert/*.crt
