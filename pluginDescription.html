@@ -1,0 +1,77 @@
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 720px; color: #1a1a1a; line-height: 1.6;">
+
+  <!-- Header -->
+  <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d6a4f 100%); border-radius: 10px; padding: 32px 36px; margin-bottom: 28px;">
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+      <div style="background: rgba(255,255,255,0.15); border-radius: 8px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+        <span style="font-family: Arial, sans-serif; font-size: 28px; font-style: italic; font-weight: bold; color: #4ade80; line-height: 1;">m</span>
+      </div>
+      <div>
+        <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">Maven Quick Build</h1>
+        <p style="margin: 4px 0 0; font-size: 14px; color: rgba(255,255,255,0.75);">One-click Maven builds directly from the toolbar</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- What it does -->
+  <p style="font-size: 15px; margin: 0 0 24px; color: #444;">
+    <strong>Maven Quick Build</strong> adds two toolbar buttons to IntelliJ IDEA for running the most common Maven lifecycle in a single click &mdash; no need to open the Maven tool window, type goals, or configure run configurations every time.
+  </p>
+
+  <!-- Buttons showcase -->
+  <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 14px; color: #1a1a1a; border-left: 4px solid #2d6a4f; padding-left: 10px;">Toolbar Buttons</h2>
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 14px;">
+    <thead>
+      <tr style="background: #f0f4f0;">
+        <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f; border-radius: 6px 0 0 0;">Button</th>
+        <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f;">Command</th>
+        <th style="text-align: left; padding: 10px 14px; font-weight: 600; color: #2d6a4f; border-radius: 0 6px 0 0;">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #e8ede8;">
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <span style="display: inline-flex; align-items: center; gap: 8px;">
+            <span style="background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 5px; padding: 2px 8px; font-family: monospace; font-weight: bold; color: #2e7d32; font-size: 13px;">!m</span>
+            Skip Tests
+          </span>
+        </td>
+        <td style="padding: 12px 14px; font-family: monospace; font-size: 12px; color: #555; vertical-align: middle;">mvn clean install -Dmaven.test.skip=true</td>
+        <td style="padding: 12px 14px; color: #555; vertical-align: middle;">Full build without running tests &mdash; ideal for fast iteration.</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 14px; vertical-align: middle;">
+          <span style="display: inline-flex; align-items: center; gap: 8px;">
+            <span style="background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 5px; padding: 2px 8px; font-family: monospace; font-weight: bold; color: #2e7d32; font-size: 13px;">m</span>
+            With Tests
+          </span>
+        </td>
+        <td style="padding: 12px 14px; font-family: monospace; font-size: 12px; color: #555; vertical-align: middle;">mvn clean install</td>
+        <td style="padding: 12px 14px; color: #555; vertical-align: middle;">Full build including all tests &mdash; perfect before committing.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Features -->
+  <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 14px; color: #1a1a1a; border-left: 4px solid #2d6a4f; padding-left: 10px;">Features</h2>
+  <ul style="margin: 0 0 28px; padding-left: 20px; font-size: 14px; color: #444;">
+    <li style="margin-bottom: 8px;">Buttons appear in <strong>MainToolBar</strong> and <strong>NavBarToolBar</strong> &mdash; always one click away</li>
+    <li style="margin-bottom: 8px;">Buttons are automatically <strong>disabled</strong> when no project is open</li>
+    <li style="margin-bottom: 8px;">Buttons are <strong>hidden</strong> in non-Maven projects &mdash; no clutter</li>
+    <li style="margin-bottom: 8px;">Uses the native <strong>MavenRunner</strong> API &mdash; output streams directly to the IDE's run console</li>
+    <li style="margin-bottom: 8px;">The skip-tests variant <strong>never mutates</strong> global Maven settings &mdash; fully safe</li>
+  </ul>
+
+  <!-- Requirements -->
+  <h2 style="font-size: 16px; font-weight: 700; margin: 0 0 14px; color: #1a1a1a; border-left: 4px solid #2d6a4f; padding-left: 10px;">Requirements</h2>
+  <ul style="margin: 0 0 28px; padding-left: 20px; font-size: 14px; color: #444;">
+    <li style="margin-bottom: 6px;"><strong>IntelliJ IDEA</strong> Community or Ultimate (2024.1 or later)</li>
+    <li style="margin-bottom: 6px;">The open project must use <strong>Maven</strong> as its build system</li>
+  </ul>
+
+  <!-- Footer -->
+  <div style="border-top: 1px solid #e0e0e0; padding-top: 16px; font-size: 12px; color: #888;">
+    Open source &mdash; <a href="https://github.com/consciousdreams/maven-quick-build" style="color: #2d6a4f; text-decoration: none;">GitHub Repository</a>
+  </div>
+
+</div>
