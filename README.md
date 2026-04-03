@@ -5,18 +5,34 @@
 [**Install from JetBrains Marketplace**](https://plugins.jetbrains.com/plugin/31045-mavenquickbuild)
 
 <!-- Plugin description -->
-An IntelliJ IDEA plugin that adds Maven shortcut buttons to the toolbar for running `mvn clean install` with or without tests.
+An IntelliJ IDEA plugin that adds fully configurable Maven shortcut buttons to the toolbar.
 
 ## Features
 
-Two toolbar buttons are added to the main toolbar and nav bar toolbar:
+- **Add, edit, or remove** toolbar buttons from **Settings → Tools → Maven Quick Build**
+- Set any **Maven goals** per button (e.g. `clean package -Pproduction`)
+- Assign **custom keyboard shortcuts** per button directly in the settings panel
+- Choose a **built-in icon** or pick any **custom SVG** from your filesystem per button
+- Buttons appear in the **MainToolBar** and **NavBarToolBar** — always one click away
+- Uses the native **MavenRunner** API — output goes directly to the IDE run console
+- Maven properties (e.g. `-Dmaven.test.skip=true`) never mutate global settings
+
+## Default Buttons
 
 | Button | Shortcut (Mac) | Shortcut (Win/Linux) | Command |
 |--------|---------------|----------------------|---------|
 | Maven Clean Install (skip tests) | `Cmd+Option+S` | `Ctrl+Alt+S` | `mvn clean install -Dmaven.test.skip=true` |
 | Maven Clean Install | `Cmd+Option+M` | `Ctrl+Alt+M` | `mvn clean install` |
 
-Both buttons are only enabled when a Maven project is open. Keyboard shortcuts are also available when the plugin is active.
+## Configuration
+
+Open **Settings → Tools → Maven Quick Build** to manage your buttons:
+
+- **Add** — set a label, Maven goals string, icon, and optional keyboard shortcut
+- **Edit** — update any field of an existing button
+- **Remove** — delete a button from the toolbar
+- **Custom SVG** — browse your filesystem to use any SVG file as a button icon
+- **Keyboard shortcut** — click the shortcut field and press any key combination; shortcuts are registered with the IDE's Keymap system and can also be changed via **Settings → Keymap**
 
 ## Requirements
 
@@ -67,20 +83,25 @@ The project uses GitHub Actions for CI/CD.
 
 ```
 src/main/java/it/consciousdreams/
-├── MavenCleanInstallAction.java          # mvn clean install -Dmaven.test.skip=true
-└── MavenCleanInstallWithTestsAction.java # mvn clean install
+├── MavenActionConfig.java              # Data model for a toolbar button
+├── MavenQuickBuildSettings.java        # Persistent app-level settings service
+├── MavenActionsRegistrar.java          # Registers dynamic actions with ActionManager on startup
+├── MavenQuickBuildActionGroup.java     # Dynamic toolbar group (reads from settings)
+├── DynamicMavenAction.java             # AnAction that runs a configured Maven command
+├── MavenQuickBuildConfigurable.java    # Settings UI (Settings → Tools → Maven Quick Build)
+└── MavenActionEditDialog.java          # Add/Edit dialog for a single button
 
 src/main/resources/
-├── META-INF/plugin.xml                   # Plugin registration & action declarations
-└── icons/                                # Toolbar button SVG icons
+├── META-INF/plugin.xml                 # Plugin registration
+├── META-INF/pluginIcon.svg             # Marketplace / Settings → Plugins logo
+└── icons/                              # Built-in toolbar button SVG icons
 ```
 
 ## How It Works
 
-Each action follows this flow:
+Each toolbar button is a `DynamicMavenAction` instance registered with `ActionManager` under a stable UUID-based ID. On every IDE startup, `MavenActionsRegistrar` syncs the registered actions with the persisted settings and applies keyboard shortcuts to the active keymap.
 
-1. `update()` — enables/shows the button only when a project is open
-2. `actionPerformed()` — verifies the project is a Maven project, then builds `MavenRunnerParameters` (goals + working directory) and `MavenRunnerSettings`, and delegates to `MavenRunner.getInstance(project).run()`
+The `MavenQuickBuildActionGroup` is registered in `plugin.xml` and its `getChildren()` looks up the registered action instances from `ActionManager`, ensuring stable references (important for tooltip display).
 
-The skip-tests variant clones the current `MavenRunnerSettings` and adds `maven.test.skip=true` to a copy of the Maven properties — global settings are never mutated.
+Goal strings like `clean install -Dmaven.test.skip=true` are parsed at execution time: tokens starting with `-D` become Maven properties, the rest become the goals list passed to `MavenRunnerParameters`.
 <!-- Plugin description end -->
