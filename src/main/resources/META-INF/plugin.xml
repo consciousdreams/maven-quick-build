@@ -3,39 +3,31 @@
     <id>it.consciousdreams.maven-quick-build</id>
     <name>MavenQuickBuild</name>
     <vendor url="https://github.com/consciousdreams/maven-quick-build">consciousdreams</vendor>
-    <description>Adds toolbar buttons to run mvn clean install with or without tests</description>
+    <description>Adds configurable toolbar buttons to run Maven commands</description>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.idea.maven</depends>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceImplementation="it.consciousdreams.MavenQuickBuildSettings"/>
+        <applicationConfigurable
+            parentId="tools"
+            instance="it.consciousdreams.MavenQuickBuildConfigurable"
+            id="it.consciousdreams.MavenQuickBuildConfigurable"
+            displayName="Maven Quick Build"/>
+    </extensions>
+
     <actions>
-        <group id="it.consciousdreams.MavenToolbarGroup" text="Maven" popup="false">
+        <group
+            id="it.consciousdreams.MavenToolbarGroup"
+            class="it.consciousdreams.MavenQuickBuildActionGroup"
+            text="Maven"
+            popup="false">
             <!-- New UI toolbar (2022.3+) -->
             <add-to-group group-id="MainToolbarRight" anchor="last"/>
             <!-- Legacy toolbar -->
             <add-to-group group-id="MainToolBar" anchor="last"/>
             <add-to-group group-id="NavBarToolBar" anchor="last"/>
-
-            <action
-                id="it.consciousdreams.MavenCleanInstallAction"
-                class="it.consciousdreams.MavenCleanInstallAction"
-                text="Maven Clean Install (skip tests)"
-                description="Runs: mvn clean install -Dmaven.test.skip=true"
-                icon="/icons/maven_install.svg">
-                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>
-                <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta alt S"/>
-                <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt S"/>
-            </action>
-            <action
-                id="it.consciousdreams.MavenCleanInstallWithTestsAction"
-                class="it.consciousdreams.MavenCleanInstallWithTestsAction"
-                text="Maven Clean Install"
-                description="Runs: mvn clean install"
-                icon="/icons/maven_install_with_tests.svg">
-                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt M"/>
-                <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta alt M"/>
-                <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt M"/>
-            </action>
         </group>
     </actions>
 </idea-plugin>
