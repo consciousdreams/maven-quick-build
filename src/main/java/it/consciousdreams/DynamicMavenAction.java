@@ -6,6 +6,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.util.IconUtil;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.idea.maven.execution.MavenRunner;
 import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
@@ -13,6 +15,8 @@ import org.jetbrains.idea.maven.execution.MavenRunnerSettings;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
 import javax.swing.Icon;
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -30,13 +34,28 @@ public class DynamicMavenAction extends AnAction {
         this.config = config;
     }
 
-    private static Icon loadIcon(String path) {
+    static Icon loadIcon(String path) {
         if (path == null || path.isEmpty()) return FALLBACK_ICON;
         try {
-            return IconLoader.getIcon(path, DynamicMavenAction.class);
+            Icon icon;
+            if (path.startsWith("/icons/")) {
+                icon = IconLoader.getIcon(path, DynamicMavenAction.class);
+            } else {
+                URL url = new File(path).toURI().toURL();
+                icon = IconLoader.findIcon(url);
+                if (icon == null) return FALLBACK_ICON;
+            }
+            return scaleToToolbarSize(icon);
         } catch (Exception ex) {
             return FALLBACK_ICON;
         }
+    }
+
+    private static Icon scaleToToolbarSize(Icon icon) {
+        int target = JBUI.scale(16);
+        int w = icon.getIconWidth();
+        if (w <= 0 || w == target) return icon;
+        return IconUtil.scale(icon, null, (float) target / w);
     }
 
     @Override

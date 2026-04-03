@@ -1,7 +1,6 @@
 package it.consciousdreams;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nls;
@@ -163,9 +162,7 @@ public class MavenQuickBuildConfigurable implements Configurable {
         public Object getValueAt(int row, int col) {
             MavenActionConfig c = rows.get(row);
             return switch (col) {
-                case 0 -> IconLoader.getIcon(
-                        c.iconPath != null ? c.iconPath : "/icons/maven_install.svg",
-                        ActionsTableModel.class);
+                case 0 -> DynamicMavenAction.loadIcon(c.iconPath);
                 case 1 -> c.label;
                 default -> c.goals;
             };
