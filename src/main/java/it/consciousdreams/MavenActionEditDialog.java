@@ -27,23 +27,48 @@ public class MavenActionEditDialog extends DialogWrapper {
             new String[]{"/icons/maven_install_with_tests.svg", "m   (with tests)"}
     );
 
-    private final JTextField                labelField;
-    private final JTextField                goalsField;
-    private final ComboBox<String[]>        iconCombo;
-    private final TextFieldWithBrowseButton customIconField;
-    private final JTextField                shortcutField;
-    private KeyStroke                       capturedKeystroke;
+    private final ComboBox<ToolType>         typeCombo;
+    private final JLabel                     commandLabel;
+    private final JTextField                 labelField;
+    private final JTextField                 goalsField;
+    private final ComboBox<String[]>         iconCombo;
+    private final TextFieldWithBrowseButton  customIconField;
+    private final JTextField                 shortcutField;
+    private KeyStroke                        capturedKeystroke;
 
     public MavenActionEditDialog(@Nullable String label, @Nullable String goals,
-                                 @Nullable String iconPath, @Nullable String shortcut) {
+                                 @Nullable String iconPath, @Nullable String shortcut,
+                                 @Nullable String commandType) {
         super(true);
+        typeCombo       = new ComboBox<>(ToolType.values());
+        commandLabel    = new JLabel("Maven Goals:");
         labelField      = new JTextField(label != null ? label : "", 30);
         goalsField      = new JTextField(goals != null ? goals : "", 30);
         iconCombo       = buildIconCombo(iconPath);
         customIconField = buildCustomIconField(iconPath);
         shortcutField   = buildShortcutField(shortcut);
-        setTitle(label == null ? "Add Maven Action" : "Edit Maven Action");
+
+        // Pre-select type
+        ToolType selected = ToolType.fromId(commandType);
+        typeCombo.setSelectedItem(selected);
+        updateCommandLabel(selected);
+
+        typeCombo.addActionListener(e -> {
+            ToolType t = (ToolType) typeCombo.getSelectedItem();
+            if (t == null) return;
+            updateCommandLabel(t);
+            // Pre-fill command field with template only when it is empty
+            if (goalsField.getText().trim().isEmpty() && !t.template.isEmpty()) {
+                goalsField.setText(t.template);
+            }
+        });
+
+        setTitle(label == null ? "Add Action" : "Edit Action");
         init();
+    }
+
+    private void updateCommandLabel(ToolType type) {
+        commandLabel.setText(type.isMaven() ? "Maven Goals:" : "Command:");
     }
 
     // ── Icon combo ────────────────────────────────────────────────────────────
@@ -106,7 +131,6 @@ public class MavenActionEditDialog extends DialogWrapper {
                 int code = e.getKeyCode();
                 if (code == VK_SHIFT || code == VK_CONTROL || code == VK_ALT
                         || code == VK_META || code == VK_UNDEFINED) return;
-
                 if (code == VK_ESCAPE && e.getModifiersEx() == 0) {
                     capturedKeystroke = null;
                     field.setText("");
@@ -130,13 +154,21 @@ public class MavenActionEditDialog extends DialogWrapper {
         gbc.insets = JBUI.insets(4);
         gbc.anchor = GridBagConstraints.WEST;
 
-        addRow(panel, gbc, 0, "Label:",        labelField,       true);
-        addRow(panel, gbc, 1, "Maven Goals:",  goalsField,       true);
-        addRow(panel, gbc, 2, "Built-in icon:", iconCombo,       false);
-        addRow(panel, gbc, 3, "Custom SVG:",   customIconField,  true);
+        addRow(panel, gbc, 0, "Type:",          typeCombo,        false);
+        addRow(panel, gbc, 1, "Label:",          labelField,       true);
 
-        // Shortcut row: field + Clear button
-        gbc.gridx = 0; gbc.gridy = 4; gbc.fill = GridBagConstraints.NONE;
+        // Command row with dynamic label
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
+        panel.add(commandLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(goalsField, gbc);
+        gbc.fill = GridBagConstraints.NONE;
+
+        addRow(panel, gbc, 3, "Built-in icon:", iconCombo,        false);
+        addRow(panel, gbc, 4, "Custom SVG:",    customIconField,  true);
+
+        // Shortcut row
+        gbc.gridx = 0; gbc.gridy = 5; gbc.fill = GridBagConstraints.NONE;
         panel.add(new JLabel("Shortcut:"), gbc);
         JPanel shortcutRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         shortcutRow.add(shortcutField);
@@ -150,11 +182,11 @@ public class MavenActionEditDialog extends DialogWrapper {
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(shortcutRow, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.NONE;
         panel.add(new JLabel("<html><small>" +
+                "Shell command runs via <code>/bin/sh -c</code> in the project root.<br>" +
                 "Click the Shortcut field and press a key combination. Esc = clear.<br>" +
-                "Custom SVG overrides built-in icon when set.<br>" +
-                "Goals example: <i>clean install -Dmaven.test.skip=true</i>" +
+                "Custom SVG overrides built-in icon when set." +
                 "</small></html>"), gbc);
 
         return panel;
@@ -177,7 +209,7 @@ public class MavenActionEditDialog extends DialogWrapper {
         if (labelField.getText().trim().isEmpty())
             return new ValidationInfo("Label is required", labelField);
         if (goalsField.getText().trim().isEmpty())
-            return new ValidationInfo("Maven Goals are required", goalsField);
+            return new ValidationInfo("Command is required", goalsField);
         String custom = customIconField.getText().trim();
         if (!custom.isEmpty()) {
             if (!custom.toLowerCase().endsWith(".svg"))
@@ -191,8 +223,12 @@ public class MavenActionEditDialog extends DialogWrapper {
 
     // ── Getters ───────────────────────────────────────────────────────────────
 
-    public String  getLabel()    { return labelField.getText().trim(); }
-    public String  getGoals()    { return goalsField.getText().trim(); }
+    public String  getLabel()       { return labelField.getText().trim(); }
+    public String  getGoals()       { return goalsField.getText().trim(); }
+    public String getCommandType() {
+        ToolType t = (ToolType) typeCombo.getSelectedItem();
+        return t != null ? t.id : ToolType.MAVEN.id;
+    }
 
     public String getIconPath() {
         String custom = customIconField.getText().trim();

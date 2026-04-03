@@ -1,5 +1,13 @@
 package it.consciousdreams;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.executors.DefaultRunExecutor;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
+import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.ui.ConsoleView;
+import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.execution.ui.RunContentManager;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,7 +22,8 @@ import org.jetbrains.idea.maven.execution.MavenRunnerParameters;
 import org.jetbrains.idea.maven.execution.MavenRunnerSettings;
 import org.jetbrains.idea.maven.project.MavenProjectsManager;
 
-import javax.swing.Icon;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,6 +44,8 @@ public class DynamicMavenAction extends AnAction {
         super(config.label, config.label, loadIcon(config.iconPath));
         this.config = config;
     }
+
+    // ── Icon loading ──────────────────────────────────────────────────────────
 
     static Icon loadIcon(String path) {
         if (path == null || path.isEmpty()) return FALLBACK_ICON;
@@ -60,14 +71,34 @@ public class DynamicMavenAction extends AnAction {
         return IconUtil.scale(icon, null, (float) target / w);
     }
 
+    // ── Action ────────────────────────────────────────────────────────────────
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
         if (project == null) return;
+        if (project.getBasePath() == null) return;
 
-        String basePath = project.getBasePath();
-        if (basePath == null) return;
+        if (config.isMaven()) {
+            runMavenCommand(project);
+        } else {
+            runShellCommand(project);
+        }
+    }
 
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabledAndVisible(e.getProject() != null);
+    }
+
+    // ── Maven execution ───────────────────────────────────────────────────────
+
+    private void runMavenCommand(Project project) {
         MavenProjectsManager mavenProjectsManager = MavenProjectsManager.getInstance(project);
         if (!mavenProjectsManager.isMavenizedProject()) {
             Messages.showWarningDialog(project, "This is not a Maven project.", config.label);
@@ -93,7 +124,7 @@ public class DynamicMavenAction extends AnAction {
 
         MavenRunnerParameters params = new MavenRunnerParameters(
                 true,
-                basePath,
+                project.getBasePath(),
                 (String) null,
                 goals,
                 Collections.emptyList()
@@ -109,13 +140,42 @@ public class DynamicMavenAction extends AnAction {
         MavenRunner.getInstance(project).run(params, settings, null);
     }
 
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
-    }
+    // ── Shell execution ───────────────────────────────────────────────────────
 
-    @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(e.getProject() != null);
+    private void runShellCommand(Project project) {
+        try {
+            boolean isWindows = System.getProperty("os.name", "").toLowerCase().contains("win");
+            List<String> cmd;
+            if (isWindows) {
+                cmd = List.of("cmd.exe", "/c", config.goals);
+            } else {
+                String shell = System.getenv("SHELL");
+                if (shell == null || shell.isEmpty()) shell = "/bin/sh";
+                cmd = List.of(shell, "-c", config.goals);
+            }
+
+            GeneralCommandLine commandLine = new GeneralCommandLine(cmd)
+                    .withWorkDirectory(project.getBasePath());
+
+            OSProcessHandler processHandler = new OSProcessHandler(commandLine);
+
+            ConsoleView console = TextConsoleBuilderFactory.getInstance()
+                    .createBuilder(project).getConsole();
+
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(console.getComponent(), BorderLayout.CENTER);
+
+            RunContentDescriptor descriptor = new RunContentDescriptor(
+                    console, processHandler, panel, config.label);
+
+            RunContentManager.getInstance(project).showRunContent(
+                    DefaultRunExecutor.getRunExecutorInstance(), descriptor);
+
+            console.attachToProcess(processHandler);
+            processHandler.startNotify();
+
+        } catch (ExecutionException ex) {
+            Messages.showErrorDialog(project, ex.getMessage(), config.label);
+        }
     }
 }

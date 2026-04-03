@@ -8,10 +8,10 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.KeyStroke;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import javax.swing.KeyStroke;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,9 +49,12 @@ public class MavenQuickBuildConfigurable implements Configurable {
                 return label;
             }
         });
-        table.getColumnModel().getColumn(1).setPreferredWidth(180);
-        table.getColumnModel().getColumn(2).setPreferredWidth(260);
-        table.getColumnModel().getColumn(3).setPreferredWidth(100);
+        // Type column
+        table.getColumnModel().getColumn(1).setMinWidth(55);
+        table.getColumnModel().getColumn(1).setMaxWidth(55);
+        table.getColumnModel().getColumn(2).setPreferredWidth(160);
+        table.getColumnModel().getColumn(3).setPreferredWidth(230);
+        table.getColumnModel().getColumn(4).setPreferredWidth(100);
 
         JPanel decoratedTable = ToolbarDecorator.createDecorator(table)
                 .setAddAction(button -> addAction())
@@ -60,7 +63,7 @@ public class MavenQuickBuildConfigurable implements Configurable {
                 .createPanel();
 
         mainPanel = new JPanel(new BorderLayout(0, 8));
-        mainPanel.add(new JLabel("Configure Maven toolbar buttons:"), BorderLayout.NORTH);
+        mainPanel.add(new JLabel("Configure toolbar buttons:"), BorderLayout.NORTH);
         mainPanel.add(decoratedTable, BorderLayout.CENTER);
 
         reset();
@@ -68,7 +71,7 @@ public class MavenQuickBuildConfigurable implements Configurable {
     }
 
     private void addAction() {
-        MavenActionEditDialog dialog = new MavenActionEditDialog(null, null, null, null);
+        MavenActionEditDialog dialog = new MavenActionEditDialog(null, null, null, null, null);
         if (dialog.showAndGet()) {
             MavenActionConfig config = new MavenActionConfig(
                     UUID.randomUUID().toString(),
@@ -76,7 +79,8 @@ public class MavenQuickBuildConfigurable implements Configurable {
                     dialog.getGoals(),
                     dialog.getIconPath()
             );
-            config.shortcut = dialog.getShortcut();
+            config.shortcut     = dialog.getShortcut();
+            config.commandType  = dialog.getCommandType();
             tableModel.addRow(config);
         }
     }
@@ -86,12 +90,13 @@ public class MavenQuickBuildConfigurable implements Configurable {
         if (row < 0) return;
         MavenActionConfig config = tableModel.getRow(row);
         MavenActionEditDialog dialog = new MavenActionEditDialog(
-                config.label, config.goals, config.iconPath, config.shortcut);
+                config.label, config.goals, config.iconPath, config.shortcut, config.commandType);
         if (dialog.showAndGet()) {
-            config.label    = dialog.getLabel();
-            config.goals    = dialog.getGoals();
-            config.iconPath = dialog.getIconPath();
-            config.shortcut = dialog.getShortcut();
+            config.label        = dialog.getLabel();
+            config.goals        = dialog.getGoals();
+            config.iconPath     = dialog.getIconPath();
+            config.shortcut     = dialog.getShortcut();
+            config.commandType  = dialog.getCommandType();
             tableModel.fireTableRowsUpdated(row, row);
         }
     }
@@ -104,8 +109,8 @@ public class MavenQuickBuildConfigurable implements Configurable {
     @Override
     public boolean isModified() {
         if (tableModel == null) return false;
-        List<MavenActionConfig> saved   = MavenQuickBuildSettings.getInstance().getActions();
-        List<MavenActionConfig> edited  = tableModel.getRows();
+        List<MavenActionConfig> saved  = MavenQuickBuildSettings.getInstance().getActions();
+        List<MavenActionConfig> edited = tableModel.getRows();
         if (saved.size() != edited.size()) return true;
         for (int i = 0; i < saved.size(); i++) {
             if (!saved.get(i).equals(edited.get(i))) return true;
@@ -141,7 +146,7 @@ public class MavenQuickBuildConfigurable implements Configurable {
             fireTableDataChanged();
         }
 
-        List<MavenActionConfig> getRows()   { return new ArrayList<>(rows); }
+        List<MavenActionConfig> getRows()     { return new ArrayList<>(rows); }
         MavenActionConfig       getRow(int i) { return rows.get(i); }
 
         void addRow(MavenActionConfig c) {
@@ -155,14 +160,15 @@ public class MavenQuickBuildConfigurable implements Configurable {
         }
 
         @Override public int getRowCount()    { return rows.size(); }
-        @Override public int getColumnCount() { return 4; }
+        @Override public int getColumnCount() { return 5; }
 
         @Override
         public String getColumnName(int col) {
             return switch (col) {
                 case 0 -> "";
-                case 1 -> "Label";
-                case 2 -> "Maven Goals";
+                case 1 -> "Type";
+                case 2 -> "Label";
+                case 3 -> "Command";
                 default -> "Shortcut";
             };
         }
@@ -172,8 +178,9 @@ public class MavenQuickBuildConfigurable implements Configurable {
             MavenActionConfig c = rows.get(row);
             return switch (col) {
                 case 0 -> DynamicMavenAction.loadIcon(c.iconPath);
-                case 1 -> c.label;
-                case 2 -> c.goals;
+                case 1 -> ToolType.fromId(c.commandType).displayName;
+                case 2 -> c.label;
+                case 3 -> c.goals;
                 default -> {
                     if (c.shortcut == null || c.shortcut.isEmpty()) yield "";
                     KeyStroke ks = KeyStroke.getKeyStroke(c.shortcut);
