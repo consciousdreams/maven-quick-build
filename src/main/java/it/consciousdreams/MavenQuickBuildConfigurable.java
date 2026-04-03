@@ -1,5 +1,6 @@
 package it.consciousdreams;
 
+import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
@@ -10,6 +11,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import javax.swing.KeyStroke;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,8 +49,9 @@ public class MavenQuickBuildConfigurable implements Configurable {
                 return label;
             }
         });
-        table.getColumnModel().getColumn(1).setPreferredWidth(200);
-        table.getColumnModel().getColumn(2).setPreferredWidth(320);
+        table.getColumnModel().getColumn(1).setPreferredWidth(180);
+        table.getColumnModel().getColumn(2).setPreferredWidth(260);
+        table.getColumnModel().getColumn(3).setPreferredWidth(100);
 
         JPanel decoratedTable = ToolbarDecorator.createDecorator(table)
                 .setAddAction(button -> addAction())
@@ -65,14 +68,16 @@ public class MavenQuickBuildConfigurable implements Configurable {
     }
 
     private void addAction() {
-        MavenActionEditDialog dialog = new MavenActionEditDialog(null, null, null);
+        MavenActionEditDialog dialog = new MavenActionEditDialog(null, null, null, null);
         if (dialog.showAndGet()) {
-            tableModel.addRow(new MavenActionConfig(
+            MavenActionConfig config = new MavenActionConfig(
                     UUID.randomUUID().toString(),
                     dialog.getLabel(),
                     dialog.getGoals(),
                     dialog.getIconPath()
-            ));
+            );
+            config.shortcut = dialog.getShortcut();
+            tableModel.addRow(config);
         }
     }
 
@@ -80,11 +85,13 @@ public class MavenQuickBuildConfigurable implements Configurable {
         int row = table.getSelectedRow();
         if (row < 0) return;
         MavenActionConfig config = tableModel.getRow(row);
-        MavenActionEditDialog dialog = new MavenActionEditDialog(config.label, config.goals, config.iconPath);
+        MavenActionEditDialog dialog = new MavenActionEditDialog(
+                config.label, config.goals, config.iconPath, config.shortcut);
         if (dialog.showAndGet()) {
             config.label    = dialog.getLabel();
             config.goals    = dialog.getGoals();
             config.iconPath = dialog.getIconPath();
+            config.shortcut = dialog.getShortcut();
             tableModel.fireTableRowsUpdated(row, row);
         }
     }
@@ -109,6 +116,7 @@ public class MavenQuickBuildConfigurable implements Configurable {
     @Override
     public void apply() {
         MavenQuickBuildSettings.getInstance().setActions(tableModel.getRows());
+        MavenActionsRegistrar.sync();
     }
 
     @Override
@@ -147,14 +155,15 @@ public class MavenQuickBuildConfigurable implements Configurable {
         }
 
         @Override public int getRowCount()    { return rows.size(); }
-        @Override public int getColumnCount() { return 3; }
+        @Override public int getColumnCount() { return 4; }
 
         @Override
         public String getColumnName(int col) {
             return switch (col) {
                 case 0 -> "";
                 case 1 -> "Label";
-                default -> "Maven Goals";
+                case 2 -> "Maven Goals";
+                default -> "Shortcut";
             };
         }
 
@@ -164,7 +173,12 @@ public class MavenQuickBuildConfigurable implements Configurable {
             return switch (col) {
                 case 0 -> DynamicMavenAction.loadIcon(c.iconPath);
                 case 1 -> c.label;
-                default -> c.goals;
+                case 2 -> c.goals;
+                default -> {
+                    if (c.shortcut == null || c.shortcut.isEmpty()) yield "";
+                    KeyStroke ks = KeyStroke.getKeyStroke(c.shortcut);
+                    yield ks != null ? KeymapUtil.getKeystrokeText(ks) : "";
+                }
             };
         }
     }

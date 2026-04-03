@@ -8,6 +8,11 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.idea.maven</depends>
 
+    <applicationListeners>
+        <listener class="it.consciousdreams.MavenActionsRegistrar"
+                  topic="com.intellij.ide.AppLifecycleListener"/>
+    </applicationListeners>
+
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="it.consciousdreams.MavenQuickBuildSettings"/>
         <applicationConfigurable

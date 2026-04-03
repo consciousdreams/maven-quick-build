@@ -5,8 +5,9 @@ import java.util.Objects;
 public class MavenActionConfig {
     public String id;
     public String label;
-    public String goals;    // e.g. "clean install -Dmaven.test.skip=true"
+    public String goals;     // e.g. "clean install -Dmaven.test.skip=true"
     public String iconPath = "/icons/maven_install.svg";
+    public String shortcut;  // KeyStroke.toString() format, e.g. "ctrl alt pressed S"
 
     public MavenActionConfig() {}
 
@@ -18,7 +19,9 @@ public class MavenActionConfig {
     }
 
     public MavenActionConfig copy() {
-        return new MavenActionConfig(id, label, goals, iconPath);
+        MavenActionConfig c = new MavenActionConfig(id, label, goals, iconPath);
+        c.shortcut = shortcut;
+        return c;
     }
 
     @Override
@@ -29,11 +32,12 @@ public class MavenActionConfig {
         return Objects.equals(id, that.id)
                 && Objects.equals(label, that.label)
                 && Objects.equals(goals, that.goals)
-                && Objects.equals(iconPath, that.iconPath);
+                && Objects.equals(iconPath, that.iconPath)
+                && Objects.equals(shortcut, that.shortcut);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, label, goals, iconPath);
+        return Objects.hash(id, label, goals, iconPath, shortcut);
     }
 }

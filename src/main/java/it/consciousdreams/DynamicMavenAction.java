@@ -29,6 +29,8 @@ public class DynamicMavenAction extends AnAction {
 
     private final MavenActionConfig config;
 
+    MavenActionConfig getConfig() { return config; }
+
     public DynamicMavenAction(MavenActionConfig config) {
         super(config.label, config.label, loadIcon(config.iconPath));
         this.config = config;

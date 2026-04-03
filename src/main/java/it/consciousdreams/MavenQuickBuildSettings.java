@@ -28,18 +28,26 @@ public final class MavenQuickBuildSettings implements PersistentStateComponent<M
 
     private static State createDefaultState() {
         State s = new State();
-        s.actions.add(new MavenActionConfig(
+        boolean mac = System.getProperty("os.name", "").toLowerCase().contains("mac");
+        String modifier = mac ? "meta alt" : "ctrl alt";
+
+        MavenActionConfig skipTests = new MavenActionConfig(
                 UUID.randomUUID().toString(),
                 "Maven Clean Install (skip tests)",
                 "clean install -Dmaven.test.skip=true",
                 "/icons/maven_install.svg"
-        ));
-        s.actions.add(new MavenActionConfig(
+        );
+        skipTests.shortcut = modifier + " pressed S";
+        s.actions.add(skipTests);
+
+        MavenActionConfig withTests = new MavenActionConfig(
                 UUID.randomUUID().toString(),
                 "Maven Clean Install",
                 "clean install",
                 "/icons/maven_install_with_tests.svg"
-        ));
+        );
+        withTests.shortcut = modifier + " pressed M";
+        s.actions.add(withTests);
         return s;
     }
 
